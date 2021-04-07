@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma-rtl.min.css">
+</head>
+<body>
+<?php
+// Tentative de connexion à la BDD
+$link = mysqli_connect("localhost", "admin", "Simpl@n974", "candyce_nail");
+ 
+// Vérification connection
+if($link === false){
+    die("ERROR: Could not connect. " . mysqli_connect_error());
+}
+ 
+// Print host information
+echo "Connect Successfully. Host info: " . mysqli_get_host_info($link);
+?>
+<?php
+if (isset($_REQUEST['username'], $_REQUEST['email'], $_REQUEST['password'])){
+  // récupérer le nom d'utilisateur et supprimer les antislashes ajoutés par le formulaire
+  $username = stripslashes($_REQUEST['username']);
+  $username = mysqli_real_escape_string($link, $username); 
+  // récupérer l'email et supprimer les antislashes ajoutés par le formulaire
+  $email = stripslashes($_REQUEST['email']);
+  $email = mysqli_real_escape_string($link, $email);
+  // récupérer le mot de passe et supprimer les antislashes ajoutés par le formulaire
+  $password = stripslashes($_REQUEST['password']);
+  $password = mysqli_real_escape_string($link, $password);
+  //requéte SQL + mot de passe crypté
+    $query = "INSERT into `client` (username, email, password)
+              VALUES ('$username', '$email', '".hash('sha256', $password)."')";
+  // Exécuter la requête sur la base de données
+    $res = mysqli_query($link, $query);
+    if($res){
+       echo "<div class='sucess'>
+             <h3>Vous êtes inscrit avec succès.</h3>
+             <p>Cliquez ici pour vous <a href='login.php'>connecter</a></p>
+       </div>";
+    }
+}else{
+?>
+<form class="box" action="" method="post">
+<div class="control">
+  <input class="input" type="text" placeholder="Nom d'utilisateur">
+</div>
+<div class="field">
+  <p class="control has-icons-left has-icons-right">
+    <input class="input" type="email" placeholder="Email">
+    <span class="icon is-small is-left">
+      <i class="fas fa-envelope"></i>
+    </span>
+    <span class="icon is-small is-right">
+      <i class="fas fa-check"></i>
+    </span>
+  </p>
+</div>
+<div class="field">
+  <p class="control has-icons-left">
+    <input class="input" type="password" placeholder="Password">
+    <span class="icon is-small is-left">
+      <i class="fas fa-lock"></i>
+    </span>
+  </p>
+</div>
+<div class="field">
+  <p class="control">
+  <input type="submit" name="submit" value="S'inscrire" class="box-button" />
+  </p>
+</div>
+</form>
+<?php } ?>
+</body>
+</html>
